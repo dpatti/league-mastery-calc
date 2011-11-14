@@ -5,7 +5,7 @@ var data = [
             index: 1,
             name: "Summoner's Wrath",
             ranks: 1,
-            desc: "Improves the following Summoner Spells: Exhaust: Reduces target's Magic Resist and Armor by 10 Ignite: Increases Ability Power and Attack Damage by 5 while on cooldown Surge: Increases Ability Power and Attack Speed gained by 10% Ghost: Increases Movement Speed bonus to 35%",
+            desc: "Improves the following Summoner Spells:\n\n|Exhaust:| Reduces target's Magic Resist and Armor by 10\n|Ignite:| Increases Ability Power and Attack Damage by 5 while on cooldown\n|Surge:| Increases Ability Power and Attack Speed gained by 10%\n|Ghost:| Increases Movement Speed bonus to 35%",
             rankInfo: [],
         },
         {
@@ -96,7 +96,8 @@ var data = [
             index: 15,
             name: "Blast",
             ranks: 4,
-            perlevel: 1,desc: "+# Ability Power per level (# Ability Power at champion level 18)",
+            perlevel: 1,
+            desc: "+# Ability Power per level\n(# Ability Power at champion level 18)",
             rankInfo: [0.25, 0.5, 0.75, 1],
         },
         {
@@ -127,7 +128,7 @@ var data = [
             index: 1,
             name: "Summoner's Resolve",
             ranks: 1,
-            desc: "Improves the following Summoner Spells: Revive: Grants a massive Movement Speed boost for a short duration upon reviving Cleanse: Increases duration of disable reduction by 1 second Heal: Increases Health restored by 15% Smite: Grants 10 bonus gold on use Garrison: Allied Garrisoned turrets deal 50% splash damage",
+            desc: "Improves the following Summoner Spells:\n\n|Revive:| Grants a massive Movement Speed boost for a short duration upon reviving\n|Cleanse:| Increases duration of disable reduction by 1 second\n|Heal:| Increases Health restored by 15%\n|Smite:| Grants 10 bonus gold on use\n|Garrison:| Allied Garrisoned turrets deal 50% splash damage",
             rankInfo: [],
         },
         {
@@ -155,7 +156,8 @@ var data = [
             index: 6,
             name: "Durability",
             ranks: 4,
-            perlevel: 1,desc: "+# Health per level (+# Health at champion level 18)",
+            perlevel: 1,
+            desc: "+# Health per level\n(+# Health at champion level 18)",
             rankInfo: [1.5, 3, 4.5, 6],
         },
         {
@@ -211,7 +213,8 @@ var data = [
             index: 15,
             name: "Enlightenment",
             ranks: 3,
-            perlevel: 1,desc: "+# Cooldown Reduction per level  (+#% Cooldown Reduction at champion level 18)",
+            perlevel: 1,
+            desc: "+# Cooldown Reduction per level\n(+#% Cooldown Reduction at champion level 18)",
             rankInfo: [0.15, 0.3, 0.45],
         },
         {
@@ -241,7 +244,7 @@ var data = [
             index: 1,
             name: "Summoner's Insight",
             ranks: 1,
-            desc: "Improves the following Summoner Spells: Teleport: Reduces cast time by 1 second Promote: Increases promoted minion's bonus defensive stats by 15% Flash: Reduces cooldown by 15 seconds Clarity: Increases Mana restored by 20% Clairvoyance: Increases duration by 2 seconds",
+            desc: "Improves the following Summoner Spells:\n\n|Teleport:| Reduces cast time by 1 second\n|Promote:| Increases promoted minion's bonus defensive stats by 15%\n|Flash:| Reduces cooldown by 15 seconds\n|Clarity:| Increases Mana restored by 20%\n|Clairvoyance:| Increases duration by 2 seconds",
             rankInfo: [],
         },
         {
@@ -255,8 +258,10 @@ var data = [
             index: 3,
             name: "Expanded Mind",
             ranks: 3,
-            perlevel: 1,desc: "+# Mana per level (+# Mana at champion level 18) or +# Energy",
+            perlevel: 1,
+            desc: "+# Mana per level\n(+# Mana at champion level 18)\nor +# Energy",
             rankInfo: [4, 8, 12],
+            rankInfo2: [4, 7, 10],
         },
         {
             index: 4,
