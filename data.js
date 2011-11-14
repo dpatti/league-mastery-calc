@@ -63,6 +63,7 @@ var data = [
             ranks: 1,
             desc: "+10% Armor Penetraton",
             rankInfo: [],
+            parent: 4,
         },
         {
             index: 11,
@@ -70,6 +71,7 @@ var data = [
             ranks: 1,
             desc: "+10% Magic Penetration",
             rankInfo: [],
+            parent: 5,
         },
         {
             index: 12,
@@ -84,6 +86,7 @@ var data = [
             ranks: 1,
             desc: "10% Critical Strike Damage",
             rankInfo: [],
+            parent: 7,
         },
         {
             index: 14,
@@ -180,6 +183,7 @@ var data = [
             ranks: 1,
             desc: "+30 Health",
             rankInfo: [],
+            parent: 4,
         },
         {
             index: 11,
@@ -194,6 +198,7 @@ var data = [
             ranks: 1,
             desc: "Returns 6 damage against minion and monster attacks",
             rankInfo: [],
+            parent: 3,
         },
         {
             index: 13,
@@ -283,6 +288,7 @@ var data = [
             ranks: 3,
             desc: "+# Mana Regen per 5 seconds",
             rankInfo: [1, 2, 3],
+            parent: 2,
         },
         {
             index: 8,
@@ -318,6 +324,7 @@ var data = [
             ranks: 2,
             desc: "Increases starting gold by #",
             rankInfo: [20, 40],
+            parent: 7,
         },
         {
             index: 15,

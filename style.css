@@ -1,13 +1,36 @@
+#s2masteries {
+    font: 11px Arial, Helvetica, sans-serif;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    margin: auto;
+}
+
+#panel {
+    float: left;
+    width: 200px;
+    text-align: center;
+}
+
 #calculator {
+    float: left;
     background: url(masteries-background.png);
     width: 920px;
     height: 524px;
     position: relative;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    user-select: none;
 }
 
+.clear {
+    clear: all;
+}
+
+/* --- Panel ---------------------------------------------------------------- */
+#points {
+    cursor: default;
+}
+
+
+/* --- Calculator ----------------------------------------------------------- */
 .tree-label {
     color: #fefefe;
     position: absolute;
@@ -40,7 +63,6 @@
 
 .tooltip {
     display: none;
-    font: 11px Arial, Helvetica, sans-serif;
     color: #fefefe;
     width: 180px;
     padding: 5px;
