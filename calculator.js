@@ -14,6 +14,7 @@ var treePoints = [0, 0, 0];
 var totalPoints = 0;
 var buttonClasses = ["unavailable", "available", "full"];
 var rankClasses = ["num-available", "num-full"];
+var calcRef;
 
 function drawCalculator() {
     for (i=0; i<3; i++) {
@@ -44,6 +45,7 @@ function drawCalculator() {
     }
 
     $("#points>.count").text(MAX_POINTS);
+    calcRef = $("#calculator");
 }
 
 function drawButton(tree, index) {
@@ -51,6 +53,7 @@ function drawButton(tree, index) {
     var buttonPos = masteryButtonPosition(tree, index);
     var status = data[tree][index].index < 5 ? "available" : "unavailable";
     var rank = 0;
+    var buttonOffset, tip;   // used for button.position() and tooltip caching
     $("#calculator").append(
         $("<div>")
             .addClass("button")
@@ -108,16 +111,21 @@ function drawButton(tree, index) {
                 $(this).mousemove();
             })
             .mousemove(function(event){
-                var tip = $(this).find(".tooltip");
-                // check if right facing
-                var offsetX=10, offsetY=10;
-                if (event.pageX + tip.width() > $(document).width() - 30)
-                    offsetX = -tip.width() - 10;
-                var outer = $("#calculator").position();
-                var button = $(this).position();
+                if (tip == undefined)
+                    tip = $(this).children(".tooltip");
+                if (buttonOffset == undefined)
+                    buttonOffset = $(this).position();
+
+                // boundary checking for tooltip (right and bottom sides)
+                var outer = calcRef.position();
+                var offsetX = 15, offsetY = 15;
+                if (event.pageX - outer.left + tip.width() > calcRef.width() - 30)
+                    offsetX = -tip.width() - 15;
+                if (event.pageY - outer.top + tip.height() > calcRef.height() - 30)
+                    offsetY = -tip.height() - 15;
                 tip.css({
-                    left: event.pageX - outer.left - button.left + offsetX,
-                    top: event.pageY - outer.top - button.top + offsetY,
+                    left: event.pageX - outer.left - buttonOffset.left + offsetX,
+                    top: event.pageY - outer.top - buttonOffset.top + offsetY,
                 });
             })
             .mouseout(function(){

@@ -24,7 +24,7 @@
 }
 
 .clear {
-    clear: all;
+    clear: both;
 }
 
 /* --- Panel ---------------------------------------------------------------- */
@@ -53,7 +53,7 @@
     height: 55px;
     position: absolute;
     cursor: pointer;
-    border: 3px ridge #999;
+    border: 3px solid #999;
     border-radius: 8px;
 }
 
