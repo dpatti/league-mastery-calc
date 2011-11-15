@@ -108,11 +108,16 @@ function drawButton(tree, index) {
                 $(this).mousemove();
             })
             .mousemove(function(event){
+                var tip = $(this).find(".tooltip");
+                // check if right facing
+                var offsetX=10, offsetY=10;
+                if (event.pageX + tip.width() > $(document).width() - 30)
+                    offsetX = -tip.width() - 10;
                 var outer = $("#calculator").position();
                 var button = $(this).position();
-                $(this).find(".tooltip").css({
-                    left: event.pageX - outer.left - button.left + 10,
-                    top: event.pageY - outer.top - button.top + 10,
+                tip.css({
+                    left: event.pageX - outer.left - button.left + offsetX,
+                    top: event.pageY - outer.top - button.top + offsetY,
                 });
             })
             .mouseout(function(){
@@ -311,6 +316,7 @@ function setState(tree, index, rank, mod) {
         $(this).data("update").call(this);
     });
     updateLabels();
+    updateLink();
 }
 
 function resetStates() {
@@ -324,13 +330,18 @@ function resetStates() {
         $(this).data("update").call(this, 0);
     });
     updateLabels();
+    updateLink();
 }
 
-function updateLabels(){
+function updateLabels() {
     for (var tree=0; tree<3; tree++) {
         $("div[data-idx="+tree+"]>.count").text(treePoints[tree]);
         $("#points>.count").text(MAX_POINTS - totalPoints);
     }
+}
+
+function updateLink() {
+    $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + exportMasteries());
 }
 
 // There are max 4 points per mastery, or 3 bits each. There is a 1 bit padding
@@ -421,11 +432,7 @@ $(function(){
             resetStates();
         }
     });
-    $("#export").click(function() {
-        $("#exportUrl")
-            //.val(document.location.origin + document.location.pathname + "?" + exportMasteries())
-            .val("?" + exportMasteries())
-            .focus()
-            .select();
+    $("#exportUrl").click(function() {
+        $(this).focus().select();
     });
 });

@@ -36,6 +36,9 @@
     display: block;
     margin: auto;
 }
+#exportUrl {
+    text-align: right;
+}
 
 
 /* --- Calculator ----------------------------------------------------------- */
