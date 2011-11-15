@@ -3,35 +3,48 @@ body {
 }
 
 #s2masteries {
-    background: url(parchment.png);
+    background: url(content_tile.png) repeat-y;
     font: 11px Arial, Helvetica, sans-serif;
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
     margin: 0 auto;
-    width: 1099px;
+    width: 932px;
     height: 624px;
-    padding: 30px;
+    padding: 40px;
+    position: relative;
 }
 
 #panel {
-    margin-top: 100px;
-    float: left;
-    width: 230px;
+    width: 920px;
     text-align: center;
+    position: relative;
 }
 
 #calculator {
-    float: left;
     background: url(masteries-background.png);
-    width: 827px;
-    height: 479px;
+    width: 920px;
+    height: 533px;
     position: relative;
-    margin: 72px 0;
+    margin: 0 auto;
 }
 
-.clear {
-    clear: both;
+.art-top {
+    width: 100%;
+    height: 234px;
+    background: url(content_top.png);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.art-bottom {
+    width: 100%;
+    height: 234px;
+    background: url(content_bot.png);
+    position: absolute;
+    bottom: 0;
+    left: 0;
 }
 
 /* --- Panel ---------------------------------------------------------------- */
@@ -56,11 +69,11 @@ body {
 }
 
 .button {
-    width: 48px;
-    height: 48px;
+    width: 54px;
+    height: 54px;
     position: absolute;
     cursor: pointer;
-    border: 2px solid #999;
+    border: 2px ridge #999;
     border-radius: 8px;
 }
 

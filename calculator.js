@@ -14,7 +14,7 @@ var treePoints = [0, 0, 0];
 var totalPoints = 0;
 var buttonClasses = ["unavailable", "available", "full"];
 var rankClasses = ["num-available", "num-full"];
-var calcRef;
+var maxDims, calcOffset;
 
 function drawCalculator() {
     for (i=0; i<3; i++) {
@@ -45,7 +45,8 @@ function drawCalculator() {
     }
 
     $("#points>.count").text(MAX_POINTS);
-    calcRef = $("#calculator");
+    calcOffset = $("#calculator").position();
+    maxDims = {width: $("#calculator").parent().width(), height: $("#calculator").parent().height()};
 }
 
 function drawButton(tree, index) {
@@ -61,7 +62,7 @@ function drawButton(tree, index) {
             .css({
                 left: buttonPos.x+"px",
                 top: buttonPos.y+"px",
-                backgroundPosition: "0px "+spritePos+"px",
+                backgroundPosition: "-2px "+(spritePos-2)+"px",
             })
             .append(
                 $("<div>")
@@ -117,11 +118,13 @@ function drawButton(tree, index) {
                     buttonOffset = $(this).position();
 
                 // boundary checking for tooltip (right and bottom sides)
-                var outer = calcRef.position();
+                var outer = $("#calculator").parent().position();
+                outer.left += calcOffset.left;
+                outer.top += calcOffset.top;
                 var offsetX = 15, offsetY = 15;
-                if (event.pageX - outer.left + tip.width() > calcRef.width() - 30)
+                if (event.pageX - outer.left + tip.width() > maxDims.width - 30)
                     offsetX = -tip.width() - 15;
-                if (event.pageY - outer.top + tip.height() > calcRef.height() - 30)
+                if (event.pageY - outer.top + tip.height() > maxDims.height - 30)
                     offsetY = -tip.height() - 15;
                 tip.css({
                     left: event.pageX - outer.left - buttonOffset.left + offsetX,
@@ -263,19 +266,19 @@ function masteryButtonPosition(tree, index) {
     var x=0, y=0;
 
     // padding for tree
-    x += 273 * tree;
+    x += 305 * tree;
     // base padding
-    x += 22;
-    y += 14;
+    x += 20;
+    y += 18;
     // padding for spacing
-    x += ix * (52 + 11);
-    y += iy * (52 + 22);
+    x += ix * (58 + 11);
+    y += iy * (58 + 26);
 
     return {x: x, y: y};
 }
 
 function masterySpritePos(tree, index) {
-    return 0 - 49.5 * (treeOffsets[tree] + index);
+    return 0 - 58 * (treeOffsets[tree] + index);
 }
 
 function masteryPointReq(tree, index) {
@@ -368,7 +371,7 @@ function updateLabels() {
 
 function updateLink() {
     var hash = exportMasteries();
-    $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + hash);
+    // $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + hash);
     document.location.hash = hash;
 }
 
