@@ -103,18 +103,16 @@ function drawButton(tree, index) {
             )
             .mouseover(function(event){
                 var tooltipText = masteryTooltip(tree, index, rank);
-                var tooltip = $(this).find(".tooltip");
-                formatTooltip(tooltip, tooltipText);
-                tooltip.show().css({
-                    left: event.pageX - parseInt($(this).css("left")) + 5,
-                    top: event.pageY - parseInt($(this).css("top")) + 5,
-                });
+                formatTooltip($(this).find(".tooltip").show(), tooltipText);
                 $(this).data("hover", true);
+                $(this).mousemove();
             })
             .mousemove(function(event){
+                var outer = $("#calculator").position();
+                var button = $(this).position();
                 $(this).find(".tooltip").css({
-                    left: event.pageX - parseInt($(this).css("left")) + 5,
-                    top: event.pageY - parseInt($(this).css("top")) + 5,
+                    left: event.pageX - outer.left - button.left + 10,
+                    top: event.pageY - outer.top - button.top + 10,
                 });
             })
             .mouseout(function(){
@@ -137,15 +135,24 @@ function drawButton(tree, index) {
                         break;
                 }
             })
-            .data("update", function() {
+            .data("update", function(newRank) {
+                if (newRank != undefined)
+                    rank = newRank;
                 if (rank == data[tree][index].ranks) {
                     status = "full";
                 } else {
-                    //check if available
+                    // check if available
                     if (masteryPointReq(tree, index) <= treePoints[tree] && masteryParentReq(tree, index))
                         status = "available";
                     else
                         status = "unavailable";
+
+                    // check if points spent
+                    if (totalPoints >= MAX_POINTS)
+                        if (rank > 0)
+                            status = "available";
+                        else
+                            status = "unavailable";
                 }
                 // change status class
                 $(this).removeClass(buttonClasses.join(" "));
@@ -258,35 +265,40 @@ function masteryParentReq(tree, index) {
 
 function isValidState(tree, index, rank, mod) {
     var mastery = data[tree][index];
-    rank = rank + mod;
-    if (rank < 0 || rank > mastery.ranks)
+    if (rank+mod < 0 || rank+mod > mastery.ranks)
         return false;
 
-    // Check max points
-    if (totalPoints + mod > MAX_POINTS)
-        return false;
+    // Incrementing
+    if (mod > 0) {
+        // Check max points
+        if (totalPoints + mod > MAX_POINTS)
+            return false;
 
-    // Check this mastery's rank requirements: use current treePoint value
-    // because we don't want to let you take rank 2 at 7 points (8 <= 7+1)
-    if (masteryPointReq(tree, index) > treePoints[tree])
-        return false;
+        // Check this mastery's rank requirements: never account for current rank
+        if (masteryPointReq(tree, index) > treePoints[tree] - rank)
+            return false;
 
-    // Check this mastery's parent requirements
-    if (!masteryParentReq(tree, index))
-        return false;
+        // Check this mastery's parent requirements
+        if (!masteryParentReq(tree, index))
+            return false;
+    }
 
-    // Check tree rank requirements
-    for (var i in state[tree])
-        if (i != index)
-            // Figure out tier, multiply by 4 to get req points
-            if (state[tree][i] > 0 && masteryPointReq(tree, i) >= treePoints[tree] + mod)
-                return false;
+    // Decrementing
+    if (mod < 0) {
+        // Check tree rank requirements
+        for (var i in state[tree])
+            if (i != index)
+                // Figure out tier, multiply by 4 to get req points
+                if (state[tree][i] > 0 && 
+                    masteryPointReq(tree, i) > treePoints[tree] + mod - (state[tree][i] || 0))
+                    return false;
 
-    // Check child requirements
-    for (var i in state[tree])
-        if (i != index)
-            if (state[tree][i] > 0 && data[tree][i].parent == index)
-                return false;
+        // Check child requirements
+        for (var i in state[tree])
+            if (i != index)
+                if (state[tree][i] > 0 && data[tree][i].parent == index)
+                    return false;
+    }
 
     return true;
 }
@@ -296,13 +308,83 @@ function setState(tree, index, rank, mod) {
     treePoints[tree] += mod;
     totalPoints += mod;
     $("#calculator .button").each(function(){
-        $(this).data("update").apply(this);
+        $(this).data("update").call(this);
     });
-    $("div[data-idx="+tree+"]>.count").text(treePoints[tree]);
-    $("#points>.count").text(MAX_POINTS - totalPoints);
+    updateLabels();
 }
 
+function resetStates() {
+    totalPoints = 0;
+    for (var tree=0; tree<3; tree++) {
+        treePoints[tree] = 0;
+        for (var index in state[tree])
+            state[tree][index] = 0;
+    }
+    $("#calculator .button").each(function(){
+        $(this).data("update").call(this, 0);
+    });
+    updateLabels();
+}
+
+function updateLabels(){
+    for (var tree=0; tree<3; tree++) {
+        $("div[data-idx="+tree+"]>.count").text(treePoints[tree]);
+        $("#points>.count").text(MAX_POINTS - totalPoints);
+    }
+}
+
+// There are max 4 points per mastery. That is 3 bits per mastery.
+// 6 bits give you 64 possibilities from the string below. Take two masteries
+// and combine the bits to select a character and add it to the string.
+// Masteries will be selected by index over tree to give the url a bit more
+// variety.
+var exportChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 function exportMasteries() {
+    var str = "";
+    var bits = 0;
+    var done = false;
+    var picked = 0;     // counter for how many picked (0 or 1, resets at 2)
+    for (var index=0; !done; index++) {
+        // This will be unset if any bits are used
+        done = true;
+        for (var tree=0; tree<3; tree++) {
+            // Trees aren't always balanced, so check to make sure we're not
+            // over the array bounds
+            if (data[tree].length <= index)
+                continue;
+
+            done = false;
+            bits = (bits << 3) | (state[tree][index] || 0);
+            picked++;
+            // we have a character
+            if (picked == 2) {
+                str = str + exportChars[bits];
+                picked = 0;
+                bits = 0;
+            }
+        }
+    }
+
+    return str;
 }
 
-drawCalculator();
+function importMasteries(str) {
+
+}
+
+$(function(){
+    // Calculator
+    drawCalculator();
+
+    // Panel
+    $("#return").click(function() {
+        if (totalPoints > 0) {
+            //confirm?
+            resetStates();
+        }
+    });
+    $("#export").click(function() {
+        $("#exportURL").text(document.location.origin + document.location.pathname + document + "?" + exportMasteries());
+        $("#exportURL").focus().select();
+    });
+});

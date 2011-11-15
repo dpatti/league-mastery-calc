@@ -3,12 +3,14 @@
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
-    margin: auto;
+    margin: 0 auto;
+    width: 1220px;
+    height: 525px;
 }
 
 #panel {
     float: left;
-    width: 200px;
+    width: 300px;
     text-align: center;
 }
 
@@ -27,6 +29,12 @@
 /* --- Panel ---------------------------------------------------------------- */
 #points {
     cursor: default;
+    font-size: 14px;
+}
+.wide {
+    width: 150px;
+    display: block;
+    margin: auto;
 }
 
 
