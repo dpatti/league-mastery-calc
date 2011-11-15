@@ -137,20 +137,19 @@ function drawButton(tree, index) {
                     case 1:
                         // Left click
                         if (isValidState(tree, index, rank, +1)) {
-                            setState(tree, index, rank++, +1);
+                            setState(tree, index, rank, +1);
                         }
                         break;
                     case 3:
                         // Right click
                         if (isValidState(tree, index, rank, -1)) {
-                            setState(tree, index, rank--, -1);
+                            setState(tree, index, rank, -1);
                         }
                         break;
                 }
             })
-            .data("update", function(newRank) {
-                if (newRank != undefined)
-                    rank = newRank;
+            .data("update", function() {
+                rank = state[tree][index] || 0;
                 if (rank == data[tree][index].ranks) {
                     status = "full";
                 } else {
@@ -335,9 +334,8 @@ function setState(tree, index, rank, mod) {
     state[tree][index] = rank + mod;
     treePoints[tree] += mod;
     totalPoints += mod;
-    $("#calculator .button").each(function(){
-        $(this).data("update").call(this);
-    });
+
+    updateButtons();
     updateLabels();
     updateLink();
 }
@@ -349,11 +347,16 @@ function resetStates() {
         for (var index in state[tree])
             state[tree][index] = 0;
     }
+
+    updateButtons();
+    updateLabels();
+    updateLink();
+}
+
+function updateButtons() {
     $("#calculator .button").each(function(){
         $(this).data("update").call(this, 0);
     });
-    updateLabels();
-    updateLink();
 }
 
 function updateLabels() {
@@ -372,26 +375,44 @@ function updateLink() {
 // mastery codes or an index increase. We greedily take masteries until the next
 // one would put us over capacity, at which point we flush the buffer. You will
 // always flush at the end of a tree.
+var maxbits = 5;
 var exportChars = "WvlgUCsA7pGZ3zSjakbP2x0mTB6htH8JuKMq1yrnwEQDLY5IVNXdcioe9fF4OR_-";
+var bitlen = function(tree, index) {
+    if (data[tree][index] == undefined)
+        return 0;
+    return Math.floor(data[tree][index].ranks/2)+1;
+}
+// returns how many of the next masteries can fit in size bits
+var bitfit = function(tree, index, bits) {
+    var start = index;
+    while (true) {
+        var len = bitlen(tree, index);
+        if (len > bits || len == 0)
+            return index - start;
+        bits -= len;
+        index++;
+    }
+}
 function exportMasteries() {
     var str = "";
     var bits = 0;
     var collected = 0; // number of bits collected in this substr
     var tree, jumpStart = -1; // jumpStart is the start of the index, which we can turn to a bool by comparing >-1
     var flush = function() {
-        str += exportChars[(jumpStart>-1) << 5 | bits];
+        str += exportChars[(jumpStart>-1) << maxbits | bits];
         bits = 0;
         collected = 0;
         jumpStart = -1;
     }
-    var bitlen = function(ranks) {
-        return Math.floor(ranks/2)+1;
-    }
     for (tree = 0; tree < 3; tree++) {
         for (var index = 0; index < data[tree].length; index++) {
+            var space = bitfit(tree, index, maxbits - collected);
+
             // check if we should flush
-            if (collected + bitlen(data[tree][index].ranks) > 5)
+            if (space < 1) {
                 flush();
+                space = bitfit(tree, index, maxbits);
+            }
 
             // if we are collecting or the condition is right for collecting:
             // - if we are jumping and this is 0, SKIP. 
@@ -399,12 +420,13 @@ function exportMasteries() {
                 continue;
             // otherwise:
             // - either we were collecting already (and haven't flushed)
-            // - or we can collect this index
-            // - or the next index can be collected and bundled with this one
-            //    (thus negating the need for a jump)
+            // - or we can collect any within the next subset that would fit in
+            //   this bit. we do this with some cool filter/map/reduce
             if (collected > 0 || 
-                state[tree][index] > 0 || 
-                ((state[tree][index+1] > 0) && (index+1 < data[tree].length) && (bitlen(data[tree][index].ranks) + bitlen(data[tree][index+1].ranks) <= 5))) {
+                [0,1,2]
+                    .filter(function(a){ return a < space; })
+                    .map(function(a){ return state[tree][index+a] || 0; })
+                    .some(function(a){ return a > 0; })){
                 // check if we are at the end of a jump
                 if (jumpStart > -1) {
                     bits = index - jumpStart;
@@ -412,7 +434,7 @@ function exportMasteries() {
                 }
                     
                 // collect more
-                var len = bitlen(data[tree][index].ranks);
+                var len = bitlen(tree, index);
                 bits = (bits << len) | (state[tree][index] || 0);
                 collected += len;
             } else if(jumpStart < 0) {
@@ -435,13 +457,68 @@ function exportMasteries() {
     return str;
 }
 
+// Because we used a random string, we need to reverse it
+var importChars = {}
+for (var i=0; i<exportChars.length; i++) {
+    importChars[exportChars[i]] = i;
+}
 function importMasteries(str) {
+    resetStates();
 
+    var tree = 0;
+    var index = 0;
+    for (var i=0; i<str.length; i++) {
+        var cur = importChars[str[i]];
+        // check for bad input
+        if (cur == undefined) 
+            return;
+        console.log("Byte: " + cur);
+        // if the first bit is a 0, we know it's not a jump (using octal)
+        if ((cur & 040) == 0) {
+            console.log("DATA");
+            // extract data
+            var num = bitfit(tree, index, maxbits); // how many we can fit
+            var sizes = [0, 1, 2] // an array of each mastery held in this char
+                            .filter(function(a){ return a < num; })
+                            .map(function(a){ return bitlen(tree, index+a); });
+            for (var j=0; j<sizes.length; j++, index++) {
+                // shift amount is the sum of all elements to the right of this one
+                var shift = sizes.slice(j + 1).reduce(function(a, b){ return a + b; }, 0);
+                // shift off the bits we don't want and AND it with a bit mask
+                var value = (cur >> shift) & ((1 << sizes[j]) - 1);
+
+                state[tree][index] = value;
+                treePoints[tree] += value;
+                totalPoints += value;
+                console.log("IMPORT: " + tree + "," + index + " = " + value);
+            }
+        } else {
+            // jump
+            var dist = cur & 037;
+            index += dist;
+            console.log("JUMP: " + dist);
+        }
+
+        // increment when we're done with a tree
+        if (index >= data[tree].length) {
+            tree++;
+            index = 0;
+            // break when we're done with all trees
+            if (tree >= data.length)
+                break;
+        }
+    }
+
+    updateButtons();
+    updateLabels();
+    updateLink();
 }
 
 $(function(){
     // Calculator
     drawCalculator();
+    if (document.location.hash != "")
+        importMasteries(document.location.hash.slice(1));
 
     // Panel
     $("#return").click(function() {
