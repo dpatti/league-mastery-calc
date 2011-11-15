@@ -384,7 +384,9 @@ $(function(){
         }
     });
     $("#export").click(function() {
-        $("#exportURL").text(document.location.origin + document.location.pathname + document + "?" + exportMasteries());
-        $("#exportURL").focus().select();
+        $("#exportUrl")
+            .val(document.location.origin + document.location.pathname + "?" + exportMasteries())
+            .focus()
+            .select();
     });
 });
