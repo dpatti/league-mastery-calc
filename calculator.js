@@ -333,20 +333,12 @@ function updateLabels(){
     }
 }
 
-// There are max 4 points per mastery, or 3 bits each. We use a 3 bit padding, 
-// so we can fit up to 3 bits after the padding. 
-//
-// 00_ = offensive
-// 01_ = defensive
-// 10_ = support
-// __1 = jump
-//
-// If one of the two next
-// masteries have more than zero points, we combine them and add them to the
-// prefix. If not, we use a jump, which means increase the index by the amount
-// in the suffix (max 8 indicies, but that will be enough).
-// Using a random string comprised of all letters
-var exportChars = "ipfFNRvchPwnLMGzSItAadxqmjlHyTkJBZYWbKuOesQUVEDgCorX"; //ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+// There are max 4 points per mastery, or 3 bits each. There is a 1 bit padding
+// that is a flag to determine whether the following 5 bits are a sequence of
+// mastery codes or an index increase. We greedily take masteries until the next
+// one would put us over capacity, at which point we flush the buffer. You will
+// always flush at the end of a tree.
+var exportChars = "WvlgUCsA7pGZ3zSjakbP2x0mTB6htH8JuKMq1yrnwEQDLY5IVNXdcioe9fF4OR_-"; //ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 function exportMasteries() {
     var str = "";
     var bits = 0;
@@ -356,9 +348,9 @@ function exportMasteries() {
         if (jumpStart > -1) {
             console.log("JUMP: " + bits);
         } else {
-            console.log("FLUSH: " + collected + " -> " + (tree << 4 | (jumpStart>-1) << 3 | bits));
+            console.log("FLUSH: " + collected + " -> " + ((jumpStart>-1) << 5 | bits));
         }
-        str += exportChars[tree << 4 | (jumpStart>-1) << 3 | bits];
+        str += exportChars[(jumpStart>-1) << 5 | bits];
         bits = 0;
         collected = 0;
         jumpStart = -1;
@@ -369,7 +361,7 @@ function exportMasteries() {
     for (tree = 0; tree < 3; tree++) {
         for (var index = 0; index < data[tree].length; index++) {
             // check if we should flush
-            if (collected + bitlen(data[tree][index].ranks) > 3)
+            if (collected + bitlen(data[tree][index].ranks) > 5)
                 flush();
 
             // if we are collecting or the condition is right for collecting:
@@ -383,7 +375,7 @@ function exportMasteries() {
             //    (thus negating the need for a jump)
             if (collected > 0 || 
                 state[tree][index] > 0 || 
-                ((state[tree][index+1] > 0) && (index+1 < data[tree].length) && (bitlen(data[tree][index].ranks) + bitlen(data[tree][index+1].ranks) <= 3))) {
+                ((state[tree][index+1] > 0) && (index+1 < data[tree].length) && (bitlen(data[tree][index].ranks) + bitlen(data[tree][index+1].ranks) <= 5))) {
                 // check if we are at the end of a jump
                 if (jumpStart > -1) {
                     bits = index - jumpStart;
@@ -402,10 +394,13 @@ function exportMasteries() {
                 jumpStart = index;
             }
         }
-        // before switching trees, check if we should flush
-        if (collected > 0)
+        // before switching trees, flush unless we just did
+        if (jumpStart > -1) {
+            bits = index - jumpStart;
             flush();
-        jumpStart = -1;
+        } else if (collected > 0) {
+            flush();
+        }
     }
 
     return str;
