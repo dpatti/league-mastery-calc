@@ -186,6 +186,8 @@ function formatTooltip(tooltip, tooltipText) {
     tooltip.find(".req").each(function(){
         if (tooltipText.req == null)
             $(this).hide();
+        else
+            $(this).text(tooltipText.req);
     });
     tooltip.find("p.first").html(tooltipText.body);
     tooltip.find("p.second").each(function(){
@@ -210,7 +212,7 @@ function masteryTooltip(tree, index, rank) {
         header: mastery.name,
         rank: "Rank: " + rank + "/" + mastery.ranks,
         rankClass: (rank < mastery.ranks ? rankClasses[0] : rankClasses[1]),
-        req: null,
+        req: masteryTooltipReq(tree, index),
         body: masteryTooltipBody(mastery, rank),
         bodyNext: showNext ? masteryTooltipBody(mastery, rank+1) : null,
     };
@@ -232,6 +234,19 @@ function masteryTooltipBody(mastery, rank)  {
         desc = desc.replace(/#/, mastery.rankInfo2[rank]);
     }
     return desc;
+}
+
+function masteryTooltipReq(tree, index) {
+    var missing = [];
+    var pointReq = masteryPointReq(tree, index)
+    if (pointReq > treePoints[tree])
+        missing.push("Requires " + pointReq + " points in " + treeNames[tree][0].toUpperCase() + treeNames[tree].slice(1));
+    if (!masteryParentReq(tree, index)) {
+        var parent = data[tree][index].parent;
+        missing.push("Requires " + data[tree][parent].ranks + " points in " + data[tree][parent].name);
+    }
+
+    return missing.join("\n");
 }
 
 function masteryButtonPosition(tree, index) {
@@ -349,18 +364,13 @@ function updateLink() {
 // mastery codes or an index increase. We greedily take masteries until the next
 // one would put us over capacity, at which point we flush the buffer. You will
 // always flush at the end of a tree.
-var exportChars = "WvlgUCsA7pGZ3zSjakbP2x0mTB6htH8JuKMq1yrnwEQDLY5IVNXdcioe9fF4OR_-"; //ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+var exportChars = "WvlgUCsA7pGZ3zSjakbP2x0mTB6htH8JuKMq1yrnwEQDLY5IVNXdcioe9fF4OR_-";
 function exportMasteries() {
     var str = "";
     var bits = 0;
     var collected = 0; // number of bits collected in this substr
     var tree, jumpStart = -1; // jumpStart is the start of the index, which we can turn to a bool by comparing >-1
     var flush = function() {
-        if (jumpStart > -1) {
-            console.log("JUMP: " + bits);
-        } else {
-            console.log("FLUSH: " + collected + " -> " + ((jumpStart>-1) << 5 | bits));
-        }
         str += exportChars[(jumpStart>-1) << 5 | bits];
         bits = 0;
         collected = 0;

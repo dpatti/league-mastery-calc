@@ -9,6 +9,7 @@
 }
 
 #panel {
+    padding-top: 20px;
     float: left;
     width: 300px;
     text-align: center;
@@ -34,10 +35,7 @@
 .wide {
     width: 150px;
     display: block;
-    margin: auto;
-}
-#exportUrl {
-    text-align: right;
+    margin: 10px auto;
 }
 
 
@@ -83,18 +81,18 @@
     border: 2px solid #323635;
     border-radius: 5px;
 }
-
 .tooltip strong {
     font-size: 13px;
     font-weight: bolder;
 }
-
 .tooltip p {
     margin-bottom: 0px;
 }
-
 .tooltip .highlight {
     color: #fecb00;
+}
+.tooltip .req {
+    color: #ff0000;
 }
 
 .counter {
