@@ -30,7 +30,7 @@ function drawCalculator() {
                     .attr("data-idx",  i)
                     .css({
                         left: pos.x + "px",
-                        bottom: "5px",
+                        bottom: "8px",
                     })
                     .append(
                         $("<span>")
@@ -49,7 +49,7 @@ function drawCalculator() {
 }
 
 function drawButton(tree, index) {
-    var spritePos = masterySpritePos(tree, index)-2;
+    var spritePos = masterySpritePos(tree, index);
     var buttonPos = masteryButtonPosition(tree, index);
     var status = data[tree][index].index < 5 ? "available" : "unavailable";
     var rank = 0;
@@ -61,7 +61,7 @@ function drawButton(tree, index) {
             .css({
                 left: buttonPos.x+"px",
                 top: buttonPos.y+"px",
-                backgroundPosition: "-2px "+spritePos+"px",
+                backgroundPosition: "0px "+spritePos+"px",
             })
             .append(
                 $("<div>")
@@ -263,19 +263,19 @@ function masteryButtonPosition(tree, index) {
     var x=0, y=0;
 
     // padding for tree
-    x += 305 * tree;
+    x += 273 * tree;
     // base padding
-    x += 18;
-    y += 10;
+    x += 22;
+    y += 14;
     // padding for spacing
-    x += ix * (59 + 12);
-    y += iy * (59 + 23.5);
+    x += ix * (52 + 11);
+    y += iy * (52 + 22);
 
     return {x: x, y: y};
 }
 
 function masterySpritePos(tree, index) {
-    return 0 - 58 * (treeOffsets[tree] + index);
+    return 0 - 49.5 * (treeOffsets[tree] + index);
 }
 
 function masteryPointReq(tree, index) {
@@ -367,7 +367,9 @@ function updateLabels() {
 }
 
 function updateLink() {
-    $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + exportMasteries());
+    var hash = exportMasteries();
+    $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + hash);
+    document.location.hash = hash;
 }
 
 // There are max 4 points per mastery, or 3 bits each. There is a 1 bit padding

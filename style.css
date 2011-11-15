@@ -1,26 +1,33 @@
+body {
+    background-color: #000;
+}
+
 #s2masteries {
+    background: url(parchment.png);
     font: 11px Arial, Helvetica, sans-serif;
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
     margin: 0 auto;
-    width: 1220px;
-    height: 525px;
+    width: 1099px;
+    height: 624px;
+    padding: 30px;
 }
 
 #panel {
-    padding-top: 20px;
+    margin-top: 100px;
     float: left;
-    width: 300px;
+    width: 230px;
     text-align: center;
 }
 
 #calculator {
     float: left;
     background: url(masteries-background.png);
-    width: 920px;
-    height: 524px;
+    width: 827px;
+    height: 479px;
     position: relative;
+    margin: 72px 0;
 }
 
 .clear {
@@ -49,11 +56,11 @@
 }
 
 .button {
-    width: 55px;
-    height: 55px;
+    width: 48px;
+    height: 48px;
     position: absolute;
     cursor: pointer;
-    border: 3px solid #999;
+    border: 2px solid #999;
     border-radius: 8px;
 }
 
