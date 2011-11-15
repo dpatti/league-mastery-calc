@@ -333,36 +333,79 @@ function updateLabels(){
     }
 }
 
-// There are max 4 points per mastery. That is 3 bits per mastery.
-// 6 bits give you 64 possibilities from the string below. Take two masteries
-// and combine the bits to select a character and add it to the string.
-// Masteries will be selected by index over tree to give the url a bit more
-// variety.
-var exportChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+// There are max 4 points per mastery, or 3 bits each. We use a 3 bit padding, 
+// so we can fit up to 3 bits after the padding. 
+//
+// 00_ = offensive
+// 01_ = defensive
+// 10_ = support
+// __1 = jump
+//
+// If one of the two next
+// masteries have more than zero points, we combine them and add them to the
+// prefix. If not, we use a jump, which means increase the index by the amount
+// in the suffix (max 8 indicies, but that will be enough).
+// Using a random string comprised of all letters
+var exportChars = "ipfFNRvchPwnLMGzSItAadxqmjlHyTkJBZYWbKuOesQUVEDgCorX"; //ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 function exportMasteries() {
     var str = "";
     var bits = 0;
-    var done = false;
-    var picked = 0;     // counter for how many picked (0 or 1, resets at 2)
-    for (var index=0; !done; index++) {
-        // This will be unset if any bits are used
-        done = true;
-        for (var tree=0; tree<3; tree++) {
-            // Trees aren't always balanced, so check to make sure we're not
-            // over the array bounds
-            if (data[tree].length <= index)
-                continue;
+    var collected = 0; // number of bits collected in this substr
+    var tree, jumpStart = -1; // jumpStart is the start of the index, which we can turn to a bool by comparing >-1
+    var flush = function() {
+        if (jumpStart > -1) {
+            console.log("JUMP: " + bits);
+        } else {
+            console.log("FLUSH: " + collected + " -> " + (tree << 4 | (jumpStart>-1) << 3 | bits));
+        }
+        str += exportChars[tree << 4 | (jumpStart>-1) << 3 | bits];
+        bits = 0;
+        collected = 0;
+        jumpStart = -1;
+    }
+    var bitlen = function(ranks) {
+        return Math.floor(ranks/2)+1;
+    }
+    for (tree = 0; tree < 3; tree++) {
+        for (var index = 0; index < data[tree].length; index++) {
+            // check if we should flush
+            if (collected + bitlen(data[tree][index].ranks) > 3)
+                flush();
 
-            done = false;
-            bits = (bits << 3) | (state[tree][index] || 0);
-            picked++;
-            // we have a character
-            if (picked == 2) {
-                str = str + exportChars[bits];
-                picked = 0;
-                bits = 0;
+            // if we are collecting or the condition is right for collecting:
+            // - if we are jumping and this is 0, SKIP. 
+            if (jumpStart > -1 && !(state[tree][index] > 0))
+                continue;
+            // otherwise:
+            // - either we were collecting already (and haven't flushed)
+            // - or we can collect this index
+            // - or the next index can be collected and bundled with this one
+            //    (thus negating the need for a jump)
+            if (collected > 0 || 
+                state[tree][index] > 0 || 
+                ((state[tree][index+1] > 0) && (index+1 < data[tree].length) && (bitlen(data[tree][index].ranks) + bitlen(data[tree][index+1].ranks) <= 3))) {
+                // check if we are at the end of a jump
+                if (jumpStart > -1) {
+                    bits = index - jumpStart;
+                    flush();
+                }
+                    
+                // collect more
+                var len = bitlen(data[tree][index].ranks);
+                bits = (bits << len) | (state[tree][index] || 0);
+                collected += len;
+            } else if(jumpStart < 0) {
+                // this is the start of a jump
+                // check for flush
+                if (collected > 0)
+                    flush();
+                jumpStart = index;
             }
         }
+        // before switching trees, check if we should flush
+        if (collected > 0)
+            flush();
+        jumpStart = -1;
     }
 
     return str;
@@ -385,7 +428,8 @@ $(function(){
     });
     $("#export").click(function() {
         $("#exportUrl")
-            .val(document.location.origin + document.location.pathname + "?" + exportMasteries())
+            //.val(document.location.origin + document.location.pathname + "?" + exportMasteries())
+            .val("?" + exportMasteries())
             .focus()
             .select();
     });
