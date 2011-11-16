@@ -359,7 +359,8 @@ function setState(tree, index, rank, mod) {
     updateLink();
 }
 
-function resetStates() {
+// If quiet flag is true, does not call updates
+function resetStates(quiet) {
     totalPoints = 0;
     for (var tree=0; tree<3; tree++) {
         treePoints[tree] = 0;
@@ -367,9 +368,11 @@ function resetStates() {
             state[tree][index] = 0;
     }
 
-    updateButtons();
-    updateLabels();
-    updateLink();
+    if (quiet != true) {
+        updateButtons();
+        updateLabels();
+        updateLink();
+    }
 }
 
 function updateButtons() {
@@ -387,8 +390,21 @@ function updateLabels() {
 
 function updateLink() {
     var hash = exportMasteries();
-    $("#exportLink").attr("href", document.location.origin + document.location.pathname + "#" + hash);
-    document.location.hash = hash;
+    // Do not show link for empty trees
+    if (hash <= 3) hash = '';
+    hash = '#' + hash;
+
+    // Update link and url only if we have to
+    $("#exportLink").attr("href", document.location.origin + document.location.pathname + hash);
+    if (document.location.hash != hash) {
+        // Using replace() causes no change in browser history
+        document.location.replace(hash);
+        // Temporarily unbind change
+        $(window).unbind('hashchange');
+        setTimeout(function(){
+            $(window).bind('hashchange', updateMasteries);
+        }, 500);
+    }
 }
 
 // There are max 4 points per mastery, or 3 bits each. There is a 1 bit padding
@@ -484,7 +500,7 @@ for (var i=0; i<exportChars.length; i++) {
     importChars[exportChars[i]] = i;
 }
 function importMasteries(str) {
-    resetStates();
+    resetStates(true);
 
     var tree = 0;
     var index = 0;
@@ -531,6 +547,10 @@ function importMasteries(str) {
     updateLink();
 }
 
+function updateMasteries() {
+    importMasteries(document.location.hash.slice(1));
+}
+
 $(function(){
     // Calculator
     drawCalculator();
@@ -550,5 +570,8 @@ $(function(){
 
     // Once set up, load if hash present
     if (document.location.hash != "")
-        importMasteries(document.location.hash.slice(1));
+        updateMasteries();
+
+    // Listen for hash changes
+    $(window).bind('hashchange', updateMasteries);
 });
