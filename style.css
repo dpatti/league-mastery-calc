@@ -1,5 +1,3 @@
-.preload { display: none; }
-
 body {
     background-color: #000;
 }
@@ -29,7 +27,7 @@ body {
     background: url(images/masteries-background.jpg);
     width: 920px;
     height: 533px;
-    position: relative;
+    position: absolute;
     margin: 0 auto;
 }
 
@@ -140,7 +138,7 @@ input[type=button] {
     border-color: #d4b654;
 }
 
-.tooltip {
+#tooltip {
     display: none;
     color: #fefefe;
     width: 180px;
@@ -151,17 +149,17 @@ input[type=button] {
     border: 2px solid #323635;
     border-radius: 5px;
 }
-.tooltip strong {
+#tooltip strong {
     font-size: 13px;
     font-weight: bolder;
 }
-.tooltip p {
+#tooltip p {
     margin-bottom: 0px;
 }
-.tooltip .highlight {
+#tooltip .highlight {
     color: #fecb00;
 }
-.tooltip .req {
+#tooltip .req {
     color: #ff0000;
 }
 
@@ -200,12 +198,12 @@ input[type=button] {
     background: url(images/req-yellow.png);
 }
 
-.tooltip .offense {
+#tooltip .offense {
     color: #983200;
 }
-.tooltip .defense {
+#tooltip .defense {
     color: #46a3ee;
 }
-.tooltip .utility {
+#tooltip .utility {
     color: #329832;
 }

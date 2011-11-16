@@ -17,17 +17,66 @@ var treePoints = [0, 0, 0];
 var totalPoints = 0;
 var buttonClasses = ["unavailable", "available", "full"];
 var rankClasses = ["num-available", "num-full"];
-var maxDims, calcOffset;
 
 function drawCalculator() {
     for (var tree = 0; tree < 3; tree++)
         for (var index = 0; index < data[tree].length; index++)
             drawButton(tree, index);
 
-    $("#calculator").contextmenu(function(event){ event.preventDefault() })
+    // make tooltip
+    var tip, maxDims = {width: $("#calculator").parent().width(), height: $("#calculator").parent().height()};
+    $("#calculator")
+        .contextmenu(function(event){ event.preventDefault() })
+        .append(
+            $("<div>")
+                .attr('id', "tooltip")
+                .append($("<strong>"))
+                .append(
+                    $("<div>")
+                        .addClass("rank")
+                )
+                .append(
+                    $("<div>")
+                        .addClass("req")
+                )
+                .append(
+                    $("<p>")
+                        .addClass("tooltip-text")
+                        .addClass("first")
+                )
+                .append(
+                    $("<p>")
+                        .addClass("tooltip-text")
+                        .addClass("second")
+                        .append(
+                            $("<div>")
+                                .addClass("nextRank")
+                                .text("Next rank:")
+                        )
+                        .append(
+                            $("<div>")
+                                .addClass("content")
+                        )
+                )
+        )
+        .mousemove(function(event){
+            if (tip.is(":visible")) {
+                // boundary checking for tooltip (right and bottom sides)
+                var pos = $(this).offset();
+                var offsetX = 15, offsetY = 15;
+                if (event.pageX - pos.left + tip.width() > maxDims.width - 30)
+                    offsetX = -tip.width() - 15;
+                if (event.pageY - pos.top + tip.height() > maxDims.height )
+                    offsetY = -tip.height() - 15;
+                tip.css({
+                    left: event.pageX - pos.left + offsetX,
+                    top:  event.pageY - pos.top + offsetY,
+                });
+            }
+        });
+    tip = $("#tooltip");
+
     $("#points>.count").text(MAX_POINTS);
-    calcOffset = $("#calculator").position();
-    maxDims = {width: $("#calculator").parent().width(), height: $("#calculator").parent().height()};
 }
 
 function drawButton(tree, index) {
@@ -35,7 +84,6 @@ function drawButton(tree, index) {
     var buttonPos = masteryButtonPosition(tree, index);
     var status = data[tree][index].index < 5 ? "available" : "unavailable";
     var rank = 0;
-    var buttonOffset, tip;   // used for button.position() and tooltip caching
 
     // Check if we need to draw the requirement
     var parent = data[tree][index].parent;
@@ -68,73 +116,18 @@ function drawButton(tree, index) {
             })
             .append(
                 $("<div>")
-                    .addClass("tooltip")
-                    .append(
-                        $("<strong>")
-                            .addClass(treeNames[tree])
-                    )
-                    .append(
-                        $("<div>")
-                            .addClass("rank")
-                    )
-                    .append(
-                        $("<div>")
-                            .addClass("req")
-                    )
-                    .append(
-                        $("<p>")
-                            .addClass("tooltip-text")
-                            .addClass("first")
-                    )
-                    .append(
-                        $("<p>")
-                            .addClass("tooltip-text")
-                            .addClass("second")
-                            .append(
-                                $("<div>")
-                                    .addClass("nextRank")
-                                    .text("Next rank:")
-                            )
-                            .append(
-                                $("<div>")
-                                    .addClass("content")
-                            )
-                    )
-            )
-            .append(
-                $("<div>")
                     .addClass("counter")
                     .addClass("num-"+status)
                     .text("0/" + data[tree][index].ranks)
             )
             .mouseover(function(event){
                 var tooltipText = masteryTooltip(tree, index, rank);
-                formatTooltip($(this).find(".tooltip").show(), tooltipText);
+                formatTooltip($("#tooltip").show(), tooltipText);
                 $(this).data("hover", true);
-                $(this).mousemove();
-            })
-            .mousemove(function(event){
-                if (tip == undefined)
-                    tip = $(this).children(".tooltip");
-                if (buttonOffset == undefined)
-                    buttonOffset = $(this).position();
-
-                // boundary checking for tooltip (right and bottom sides)
-                var outer = $("#calculator").parent().position();
-                outer.left += calcOffset.left;
-                outer.top += calcOffset.top;
-                var offsetX = 15, offsetY = 15;
-                if (event.pageX - outer.left + tip.width() > maxDims.width - 30)
-                    offsetX = -tip.width() - 15;
-                if (event.pageY - outer.top + tip.height() > maxDims.height - 30)
-                    offsetY = -tip.height() - 15;
-                tip.css({
-                    left: event.pageX - outer.left - buttonOffset.left + offsetX,
-                    top: event.pageY - outer.top - buttonOffset.top + offsetY,
-                });
+                $(this).parent().mousemove();
             })
             .mouseout(function(){
-                $(this).find(".tooltip").hide();
+                $("#tooltip").hide();
                 $(this).data("hover", false);
             })
             .mousedown(function(event){
@@ -194,7 +187,10 @@ function drawButton(tree, index) {
 }
 
 function formatTooltip(tooltip, tooltipText) {
-    tooltip.find("strong").text(tooltipText.header);
+    tooltip.find("strong")
+        .text(tooltipText.header)
+        .removeClass(treeNames.join(" "))
+        .addClass(treeNames[tooltipText.tree]);
     tooltip.find(".rank").each(function(){
         $(this)
             .removeClass(rankClasses.join(" "))
@@ -227,6 +223,7 @@ function masteryTooltip(tree, index, rank) {
 
     // parse text
     var text = {
+        tree: tree,
         header: mastery.name,
         rank: "Rank: " + rank + "/" + mastery.ranks,
         rankClass: (rank < mastery.ranks ? rankClasses[0] : rankClasses[1]),
