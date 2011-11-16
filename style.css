@@ -122,7 +122,7 @@ input[type=button] {
     height: 54px;
     position: absolute;
     cursor: pointer;
-    border: 2px ridge #999;
+    border: 2px solid #999;
     border-radius: 8px;
     z-index: 1;
     background-image: url(images/button-icons.png);
