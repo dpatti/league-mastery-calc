@@ -10,6 +10,8 @@ var treeOffsets = [
 ];
 var MAX_POINTS = 30;
 var TREE_OFFSET = 305;
+var HEIGHT_GAP = 26;
+var BUTTON_SIZE = 56;
 var state = [{}, {}, {}];
 var treePoints = [0, 0, 0];
 var totalPoints = 0;
@@ -18,12 +20,9 @@ var rankClasses = ["num-available", "num-full"];
 var maxDims, calcOffset;
 
 function drawCalculator() {
-    for (i=0; i<3; i++) {
-        for (j=0; j<data[i].length; j++) {
-            drawButton(i, j);
-        }
-        var pos = masteryButtonPosition(i, 0);
-    }
+    for (var tree = 0; tree < 3; tree++)
+        for (var index = 0; index < data[tree].length; index++)
+            drawButton(tree, index);
 
     $("#calculator").contextmenu(function(event){ event.preventDefault() })
     $("#points>.count").text(MAX_POINTS);
@@ -37,10 +36,31 @@ function drawButton(tree, index) {
     var status = data[tree][index].index < 5 ? "available" : "unavailable";
     var rank = 0;
     var buttonOffset, tip;   // used for button.position() and tooltip caching
+
+    // Check if we need to draw the requirement
+    var parent = data[tree][index].parent;
+    var parentLink = null;
+    if (parent != undefined) {
+        var parentPos = masteryButtonPosition(tree, parent);
+        $("#calculator").append(parentLink = 
+            $("<div>")
+                .addClass("requirement")
+                .addClass("unavailable")
+                // height is one gap and button for each in between them, plus an extra gap 
+                .css({
+                    height: (HEIGHT_GAP + BUTTON_SIZE) * 
+                            (data[tree][index].index/4 - data[tree][parent].index/4 - 1) + HEIGHT_GAP + 5,
+                    left: parentPos.x + 18,
+                    top: parentPos.y + BUTTON_SIZE - 2,
+                })
+        );
+    }
+
     $("#calculator").append(
         $("<div>")
             .addClass("button")
             .addClass(status)
+            .data("parentLink", parentLink)
             .css({
                 left: buttonPos.x+"px",
                 top: buttonPos.y+"px",
@@ -159,6 +179,12 @@ function drawButton(tree, index) {
                     .removeClass(rankClasses.join(" "))
                     .addClass("num-"+status)
                     .text(rank + "/" + data[tree][index].ranks);
+                // change parent status
+                if ($(this).data("parentLink") != null) {
+                    $(this).data("parentLink")
+                        .removeClass(buttonClasses.join(" "))
+                        .addClass(status);
+                }
                 // force tooltip redraw
                 if ($(this).data("hover")) {
                     $(this).mouseover();
@@ -253,8 +279,8 @@ function masteryButtonPosition(tree, index) {
     x += 20;
     y += 18;
     // padding for spacing
-    x += ix * (58 + 11);
-    y += iy * (58 + 26);
+    x += ix * (BUTTON_SIZE + 11);
+    y += iy * (BUTTON_SIZE + HEIGHT_GAP);
 
     return {x: x, y: y};
 }
@@ -353,7 +379,7 @@ function updateLabels() {
 
 function updateLink() {
     var hash = exportMasteries();
-    $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + hash);
+    $("#exportLink").attr("href", document.location.origin + document.location.pathname + "#" + hash);
     document.location.hash = hash;
 }
 
@@ -459,10 +485,8 @@ function importMasteries(str) {
         // check for bad input
         if (cur == undefined) 
             return;
-        console.log("Byte: " + cur);
         // if the first bit is a 0, we know it's not a jump (using octal)
         if ((cur & 040) == 0) {
-            console.log("DATA");
             // extract data
             var num = bitfit(tree, index, maxbits); // how many we can fit
             var sizes = [0, 1, 2] // an array of each mastery held in this char
@@ -477,13 +501,11 @@ function importMasteries(str) {
                 state[tree][index] = value;
                 treePoints[tree] += value;
                 totalPoints += value;
-                console.log("IMPORT: " + tree + "," + index + " = " + value);
             }
         } else {
             // jump
             var dist = cur & 037;
             index += dist;
-            console.log("JUMP: " + dist);
         }
 
         // increment when we're done with a tree
@@ -506,15 +528,7 @@ $(function(){
     drawCalculator();
 
     // Panel
-    $("#return").click(function() {
-        if (totalPoints > 0) {
-            //confirm?
-            resetStates();
-        }
-    });
-    $("#exportUrl").click(function() {
-        $(this).focus().select();
-    });
+    $("#return").click(resetStates);
     for (var tree = 0; tree < 3; tree++) {
         $("#panel>#tree-summaries").append(
             $("<div>")
@@ -522,7 +536,7 @@ $(function(){
                 .addClass(treeNames[tree])
                 .attr("data-idx", tree)
                 .text(0)
-                .css("left", TREE_OFFSET * tree + 130)
+                .css("left", TREE_OFFSET * tree + 120)
         );
     }
 
