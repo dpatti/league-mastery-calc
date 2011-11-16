@@ -16,7 +16,7 @@ var state = [{}, {}, {}];
 var treePoints = [0, 0, 0];
 var totalPoints = 0;
 var buttonClasses = ["unavailable", "available", "full"];
-var rankClasses = ["num-available", "num-full"];
+var rankClasses = ["num-unavailable", "num-available", "num-full"];
 
 function drawCalculator() {
     for (var tree = 0; tree < 3; tree++)
@@ -251,7 +251,7 @@ function masteryTooltip(tree, index, rank) {
         tree: tree,
         header: mastery.name,
         rank: "Rank: " + rank + "/" + mastery.ranks,
-        rankClass: (rank < mastery.ranks ? rankClasses[0] : rankClasses[1]),
+        rankClass: (rank < mastery.ranks ? rankClasses[1] : rankClasses[2]),
         req: masteryTooltipReq(tree, index),
         body: masteryTooltipBody(mastery, rank),
         bodyNext: showNext ? masteryTooltipBody(mastery, rank+1) : null,
@@ -375,7 +375,6 @@ function setState(tree, index, rank, mod) {
 
 // If quiet flag is true, does not call updates
 function resetStates(quiet) {
-    totalPoints = 0;
     for (var tree=0; tree<3; tree++)
         resetTree(tree);
 
@@ -388,6 +387,7 @@ function resetStates(quiet) {
 
 // Used in both resetStates and via panel
 function resetTree(tree, update) {
+    totalPoints -= treePoints[tree];
     treePoints[tree] = 0;
     for (var index in state[tree])
         state[tree][index] = 0;
