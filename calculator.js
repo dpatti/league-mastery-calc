@@ -276,7 +276,7 @@ function masteryButtonPosition(tree, index) {
     x += 20;
     y += 18;
     // padding for spacing
-    x += ix * (BUTTON_SIZE + 11);
+    x += ix * (BUTTON_SIZE + 15);
     y += iy * (BUTTON_SIZE + HEIGHT_GAP);
 
     return {x: x, y: y};
