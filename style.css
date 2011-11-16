@@ -94,15 +94,16 @@ input[type=button] {
     font-size: 30px;
     font-weight: bold;
     position: absolute;
+    background-image: url(images/tree-icons.png);
 }
 #tree-summaries .offense {
-    background-image: url(images/tree-offense.png);
+    background-position: 0px 0px;
 }
 #tree-summaries .defense {
-    background-image: url(images/tree-defense.png);
+    background-position: 0px -43px;
 }
 #tree-summaries .utility {
-    background-image: url(images/tree-utility.png);
+    background-position: 0px -86px;
 }
 
 
@@ -123,18 +124,16 @@ input[type=button] {
     border: 2px ridge #999;
     border-radius: 8px;
     z-index: 1;
+    background-image: url(images/button-icons.png);
 }
 
 .button.unavailable {
-    background-image: url(images/icon-sprite-bw.png);
     border-color: #999;
 }
 .button.available {
-    background-image: url(images/icon-sprite.png);
     border-color: #00ff00;
 }
 .button.full {
-    background-image: url(images/icon-sprite.png);
     border-color: #d4b654;
 }
 
@@ -187,15 +186,16 @@ input[type=button] {
 .requirement {
     width: 21px;
     position: absolute;
+    background: url(images/req-bars.png);
 }
 .requirement.unavailable {
-    background: url(images/req-gray.png);
+    background-position: 0px 0px;
 }
 .requirement.available {
-    background: url(images/req-green.png);
+    background-position: -21px 0px;
 }
 .requirement.full {
-    background: url(images/req-yellow.png);
+    background-position: -42px 0px;
 }
 
 #tooltip .offense {

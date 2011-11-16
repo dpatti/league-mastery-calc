@@ -112,7 +112,9 @@ function drawButton(tree, index) {
             .css({
                 left: buttonPos.x+"px",
                 top: buttonPos.y+"px",
-                backgroundPosition: "-2px "+(spritePos-2)+"px",
+                // Sprite has two columns: 0px is color and -58px is black and white
+                backgroundPosition: (status != "unavailable" ? -2 : -60) + "px " + 
+                                    (spritePos - 2) + "px",
             })
             .append(
                 $("<div>")
@@ -166,8 +168,13 @@ function drawButton(tree, index) {
                 }
                 // change status class
                 if ( !$(this).hasClass(status) ) {
-                    $(this).removeClass(buttonClasses.join(" "));
-                    $(this).addClass(status);
+                    $(this)
+                        .removeClass(buttonClasses.join(" "))
+                        .addClass(status)
+                        .css({
+                            backgroundPosition: (status != "unavailable" ? -2 : -60) + "px " + 
+                                                (spritePos - 2) + "px",
+                        });
                 }
                 // adjust counter
                 var counter = $(this).find(".counter").text(rank + "/" + data[tree][index].ranks);
