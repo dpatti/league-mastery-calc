@@ -165,55 +165,66 @@ function drawButton(tree, index) {
                             status = "unavailable";
                 }
                 // change status class
-                $(this).removeClass(buttonClasses.join(" "));
-                $(this).addClass(status);
+                if ( !$(this).hasClass(status) ) {
+                    $(this).removeClass(buttonClasses.join(" "));
+                    $(this).addClass(status);
+                }
                 // adjust counter
-                $(this).find(".counter")
-                    .removeClass(rankClasses.join(" "))
-                    .addClass("num-"+status)
-                    .text(rank + "/" + data[tree][index].ranks);
+                var counter = $(this).find(".counter").text(rank + "/" + data[tree][index].ranks);
+                if ( !counter.hasClass("num-"+status) ) {
+                    counter
+                        .removeClass(rankClasses.join(" "))
+                        .addClass("num-"+status)
+                }
+
                 // change parent status
-                if ($(this).data("parentLink") != null) {
-                    $(this).data("parentLink")
-                        .removeClass(buttonClasses.join(" "))
-                        .addClass(status);
+                var parentLink = $(this).data("parentLink");
+                if (parentLink != null) {
+                    if ( !parentLink.hasClass(status) ) {
+                        parentLink
+                            .removeClass(buttonClasses.join(" "))
+                            .addClass(status);
+                    }
                 }
                 // force tooltip redraw
-                if ($(this).data("hover")) {
+                if ($(this).data("hover"))
                     $(this).mouseover();
-                }
             })
     );
 }
 
 function formatTooltip(tooltip, tooltipText) {
-    tooltip.find("strong")
-        .text(tooltipText.header)
-        .removeClass(treeNames.join(" "))
-        .addClass(treeNames[tooltipText.tree]);
-    tooltip.find(".rank").each(function(){
-        $(this)
+    var head = tooltip.find("strong").text(tooltipText.header);
+    if ( !head.hasClass(treeNames[tooltipText.tree]) ) {
+        head
+            .removeClass(treeNames.join(" "))
+            .addClass(treeNames[tooltipText.tree]);
+    }
+
+    var rank = tooltip.find(".rank").text(tooltipText.rank);
+    if ( !rank.hasClass(tooltipText.rankClass) ) {
+        rank
             .removeClass(rankClasses.join(" "))
             .addClass(tooltipText.rankClass)
-            .text(tooltipText.rank);
-    });
-    tooltip.find(".req").each(function(){
-        if (tooltipText.req == null)
-            $(this).hide();
-        else
-            $(this).text(tooltipText.req);
-    });
+    }
+
+    var req = tooltip.find(".req");
+    if (tooltipText.req == null)
+        req.hide();
+    else
+        req.text(tooltipText.req);
+
     tooltip.find("p.first").html(tooltipText.body);
-    tooltip.find("p.second").each(function(){
-        if (tooltipText.bodyNext == null) {
-            $(this).hide();
-        } else {
-            $(this)
-                .show()
-                .find(".content")
-                    .html(tooltipText.bodyNext);
-        }
-    });
+
+    var second = tooltip.find("p.second");
+    if (tooltipText.bodyNext == null) {
+        second.hide();
+    } else {
+        second
+            .show()
+            .find(".content")
+                .html(tooltipText.bodyNext);
+    }
 }
 
 function masteryTooltip(tree, index, rank) {
