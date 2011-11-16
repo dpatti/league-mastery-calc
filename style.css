@@ -1,14 +1,17 @@
+.preload { display: none; }
+
 body {
     background-color: #000;
 }
 
 #s2masteries {
-    background: url(content_tile.png) repeat-y;
+    background: url(images/content_tile.jpg) repeat-y;
+    background-color: #EFE0AA;
     font: 11px Arial, Helvetica, sans-serif;
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
-    margin: 0 auto;
+    margin: 50px auto;
     width: 932px;
     height: 624px;
     padding: 40px;
@@ -17,12 +20,12 @@ body {
 
 #panel {
     width: 920px;
-    text-align: center;
     position: relative;
+    cursor: default;
 }
 
 #calculator {
-    background: url(masteries-background.png);
+    background: url(images/masteries-background.jpg);
     width: 920px;
     height: 533px;
     position: relative;
@@ -32,7 +35,7 @@ body {
 .art-top {
     width: 100%;
     height: 234px;
-    background: url(content_top.png);
+    background: url(images/content_top.png);
     position: absolute;
     top: 0;
     left: 0;
@@ -40,8 +43,8 @@ body {
 
 .art-bottom {
     width: 100%;
-    height: 234px;
-    background: url(content_bot.png);
+    height: 150px;
+    background: url(images/content_bot.jpg);
     position: absolute;
     bottom: 0;
     left: 0;
@@ -49,13 +52,41 @@ body {
 
 /* --- Panel ---------------------------------------------------------------- */
 #points {
-    cursor: default;
-    font-size: 14px;
+    font-size: 18px;
+    margin-right: 30px;
+    margin-bottom: 10px;
 }
-.wide {
+input[type=button] {
     width: 150px;
-    display: block;
-    margin: 10px auto;
+    float: right;
+    /*background: url(images/button.png);*/
+}
+
+#tree-summaries {
+    height: 40px;
+    position: relative;
+    width: 100%;
+    margin-bottom: 4px;
+}
+.tree-summary {
+    width: 40px;
+    height: 30px;
+    padding: 5px;
+    padding-left: 40px;
+    background-repeat: no-repeat;
+    text-align: left;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+}
+.offense {
+    background-image: url(images/tree-offense.png);
+}
+.defense {
+    background-image: url(images/tree-defense.png);
+}
+.utility {
+    background-image: url(images/tree-utility.png);
 }
 
 
@@ -78,15 +109,15 @@ body {
 }
 
 .button.unavailable {
-    background-image: url(icon-sprite-bw.png);
+    background-image: url(images/icon-sprite-bw.png);
     border-color: #999;
 }
 .button.available {
-    background-image: url(icon-sprite.png);
+    background-image: url(images/icon-sprite.png);
     border-color: #00ff00;
 }
 .button.full {
-    background-image: url(icon-sprite.png);
+    background-image: url(images/icon-sprite.png);
     border-color: #d4b654;
 }
 

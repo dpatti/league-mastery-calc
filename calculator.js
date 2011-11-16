@@ -1,7 +1,7 @@
 var treeNames = [
-    "offensive",
-    "defensive",
-    "support",
+    "offense",
+    "defense",
+    "utility",
 ];
 var treeOffsets = [
     0,
@@ -9,6 +9,7 @@ var treeOffsets = [
     data[0].length + data[1].length
 ];
 var MAX_POINTS = 30;
+var TREE_OFFSET = 305;
 var state = [{}, {}, {}];
 var treePoints = [0, 0, 0];
 var totalPoints = 0;
@@ -22,28 +23,9 @@ function drawCalculator() {
             drawButton(i, j);
         }
         var pos = masteryButtonPosition(i, 0);
-        $("#calculator")
-            .contextmenu(function(event){ event.preventDefault() })
-            .append(
-                $("<div>")
-                    .addClass("tree-label")
-                    .attr("data-idx",  i)
-                    .css({
-                        left: pos.x + "px",
-                        bottom: "8px",
-                    })
-                    .append(
-                        $("<span>")
-                            .text(treeNames[i].toUpperCase() + ": ")
-                    )
-                    .append(
-                        $("<span>")
-                            .addClass("count")
-                            .text("0")
-                    )
-            );
     }
 
+    $("#calculator").contextmenu(function(event){ event.preventDefault() })
     $("#points>.count").text(MAX_POINTS);
     calcOffset = $("#calculator").position();
     maxDims = {width: $("#calculator").parent().width(), height: $("#calculator").parent().height()};
@@ -266,7 +248,7 @@ function masteryButtonPosition(tree, index) {
     var x=0, y=0;
 
     // padding for tree
-    x += 305 * tree;
+    x += TREE_OFFSET * tree;
     // base padding
     x += 20;
     y += 18;
@@ -364,14 +346,14 @@ function updateButtons() {
 
 function updateLabels() {
     for (var tree=0; tree<3; tree++) {
-        $("div[data-idx="+tree+"]>.count").text(treePoints[tree]);
+        $("div[data-idx="+tree+"]").text(treePoints[tree]);
         $("#points>.count").text(MAX_POINTS - totalPoints);
     }
 }
 
 function updateLink() {
     var hash = exportMasteries();
-    // $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + hash);
+    $("#exportUrl").val(document.location.origin + document.location.pathname + "#" + hash);
     document.location.hash = hash;
 }
 
@@ -522,8 +504,6 @@ function importMasteries(str) {
 $(function(){
     // Calculator
     drawCalculator();
-    if (document.location.hash != "")
-        importMasteries(document.location.hash.slice(1));
 
     // Panel
     $("#return").click(function() {
@@ -535,4 +515,18 @@ $(function(){
     $("#exportUrl").click(function() {
         $(this).focus().select();
     });
+    for (var tree = 0; tree < 3; tree++) {
+        $("#panel>#tree-summaries").append(
+            $("<div>")
+                .addClass("tree-summary")
+                .addClass(treeNames[tree])
+                .attr("data-idx", tree)
+                .text(0)
+                .css("left", TREE_OFFSET * tree + 130)
+        );
+    }
+
+    // Once set up, load if hash present
+    if (document.location.hash != "")
+        importMasteries(document.location.hash.slice(1));
 });
