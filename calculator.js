@@ -67,11 +67,11 @@ function drawCalculator() {
             if (tip.is(":visible")) {
                 // boundary checking for tooltip (right and bottom sides)
                 var pos = anchor.offset();
-                var offsetX = 15, offsetY = 15;
+                var offsetX = 20, offsetY = 20;
                 if (event.pageX - pos.left + tip.width() > maxDims.width - 30)
-                    offsetX = -tip.width() - 15;
+                    offsetX = -tip.width() - 20;
                 if (event.pageY - pos.top + tip.height() > maxDims.height )
-                    offsetY = -tip.height() - 15;
+                    offsetY = -tip.height() - 20;
                 tip.css({
                     left: event.pageX - pos.left + offsetX,
                     top:  event.pageY - pos.top + offsetY,
