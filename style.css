@@ -27,7 +27,7 @@ body {
     background: url(images/masteries-background.jpg);
     width: 920px;
     height: 533px;
-    position: absolute;
+    position: relative;
     margin: 0 auto;
 }
 
