@@ -58,11 +58,15 @@ function drawCalculator() {
                                 .addClass("content")
                         )
                 )
-        )
+        );
+
+    // mousemove event global since it follows tooltip visibility
+    var anchor = $("#calculator");
+    $(window)
         .mousemove(function(event){
             if (tip.is(":visible")) {
                 // boundary checking for tooltip (right and bottom sides)
-                var pos = $(this).offset();
+                var pos = anchor.offset();
                 var offsetX = 15, offsetY = 15;
                 if (event.pageX - pos.left + tip.width() > maxDims.width - 30)
                     offsetX = -tip.width() - 15;
@@ -200,27 +204,30 @@ function drawButton(tree, index) {
     );
 }
 
+function customTooltip(tooltip, tooltipText) {
+    tooltip.addClass("custom");
+    tooltip.children(":not(p.first)").hide();
+    tooltip.find("p.first").text(tooltipText);
+}
+
 function formatTooltip(tooltip, tooltipText) {
-    var head = tooltip.find("strong").text(tooltipText.header);
+    tooltip.removeClass("custom");
+
+    var head = tooltip.find("strong").text(tooltipText.header).show();
     if ( !head.hasClass(treeNames[tooltipText.tree]) ) {
         head
             .removeClass(treeNames.join(" "))
             .addClass(treeNames[tooltipText.tree]);
     }
 
-    var rank = tooltip.find(".rank").text(tooltipText.rank);
+    var rank = tooltip.find(".rank").text(tooltipText.rank).show();
     if ( !rank.hasClass(tooltipText.rankClass) ) {
         rank
             .removeClass(rankClasses.join(" "))
             .addClass(tooltipText.rankClass)
     }
 
-    var req = tooltip.find(".req");
-    if (tooltipText.req == null)
-        req.hide();
-    else
-        req.text(tooltipText.req);
-
+    tooltip.find(".req").text(tooltipText.req).show();
     tooltip.find("p.first").html(tooltipText.body);
 
     var second = tooltip.find("p.second");
@@ -369,17 +376,21 @@ function setState(tree, index, rank, mod) {
 // If quiet flag is true, does not call updates
 function resetStates(quiet) {
     totalPoints = 0;
-    for (var tree=0; tree<3; tree++) {
-        treePoints[tree] = 0;
-        for (var index in state[tree])
-            state[tree][index] = 0;
-    }
+    for (var tree=0; tree<3; tree++)
+        resetTree(tree);
 
     if (quiet != true) {
         updateButtons();
         updateLabels();
         updateLink();
     }
+}
+
+// Used in both resetStates and via panel
+function resetTree(tree, update) {
+    treePoints[tree] = 0;
+    for (var index in state[tree])
+        state[tree][index] = 0;
 }
 
 function updateButtons() {
@@ -571,7 +582,25 @@ $(function(){
                 .addClass(treeNames[tree])
                 .attr("data-idx", tree)
                 .text(0)
-                .css("left", TREE_OFFSET * tree + 120)
+                .css({
+                    left: TREE_OFFSET * tree + 120,
+                    cursor: "pointer",
+                })
+                .mouseover(function(){
+                    customTooltip($("#tooltip").show(), "Double click to reset tree");
+                })
+                .mouseout(function(){
+                    $("#tooltip").hide();
+                })
+                .dblclick(function(){
+                    resetTree($(this).attr("data-idx"), true);
+                    updateButtons();
+                    updateLabels();
+                    updateLink();
+                })
+        )
+        .append(
+            $("<div>")
         );
     }
 

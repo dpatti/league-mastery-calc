@@ -75,6 +75,7 @@ body {
     top: 0;
 }
 input[type=button] {
+    cursor: pointer;
     width: 150px;
 }
 
@@ -160,6 +161,12 @@ input[type=button] {
 }
 #tooltip .req {
     color: #ff0000;
+}
+#tooltip.custom {
+    width: auto;
+}
+#tooltip.custom p {
+    margin-top: 0px;
 }
 
 .counter {
