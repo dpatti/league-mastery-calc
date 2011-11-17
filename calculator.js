@@ -409,7 +409,7 @@ function updateLabels() {
 function updateLink() {
     var hash = exportMasteries();
     // Do not show link for empty trees
-    if (hash <= 3) hash = '';
+    if (hash.length <= 3) hash = '';
     hash = '#' + hash;
 
     // Update link and url only if we have to
