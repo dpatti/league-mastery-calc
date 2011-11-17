@@ -160,6 +160,7 @@ button:active {
 
 .button.unavailable {
     border-color: #999;
+    cursor: default;
 }
 .button.available {
     border-color: #00ff00;
