@@ -583,7 +583,7 @@ $(function(){
                 .attr("data-idx", tree)
                 .text(0)
                 .css({
-                    left: TREE_OFFSET * tree + 120,
+                    left: TREE_OFFSET * tree + 126,
                     cursor: "pointer",
                 })
                 .mouseover(function(){
