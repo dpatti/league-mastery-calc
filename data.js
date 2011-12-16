@@ -34,7 +34,7 @@ var data = [
             name: "Alacrity",
             ranks: 4,
             desc: "+#% Attack Speed",
-            rankInfo: [1.5, 3, 4.5, 6],
+            rankInfo: [1, 2, 3, 4],
         },
         {
             index: 7,
@@ -131,7 +131,7 @@ var data = [
             index: 1,
             name: "Summoner's Resolve",
             ranks: 1,
-            desc: "Improves the following Summoner Spells:\n\n|Revive:| Grants a massive Movement Speed boost for a short duration upon reviving\n|Cleanse:| Increases duration of disable reduction by 1 second\n|Heal:| Increases Health restored by 15%\n|Smite:| Grants 10 bonus gold on use\n|Garrison:| Allied Garrisoned turrets deal 50% splash damage",
+            desc: "Improves the following Summoner Spells:\n\n|Revive:| Grants a massive Movement Speed boost for a short duration upon reviving\n|Cleanse:| Increases duration of disable reduction by 1 second\n|Heal:| Increases Health restored by 10%\n|Smite:| Grants 10 bonus gold on use\n|Garrison:| Allied Garrisoned turrets deal 50% splash damage",
             rankInfo: [],
         },
         {
@@ -342,10 +342,10 @@ var data = [
         },
         {
             index: 18,
-            name: "Perseverance",
+            name: "Strength of Spirit",
             ranks: 3,
-            desc: "Increases Health and Mana Regen by #%",
-            rankInfo: [3, 6, 9],
+            desc: "Increases health regen per 5 seconds by #% of maximum mana",
+            rankInfo: [0.4, 0.7, 1],
         },
         {
             index: 19,
