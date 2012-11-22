@@ -423,7 +423,7 @@ function updateLink() {
     hash = '#' + hash;
 
     // Update link and url only if we have to
-    $("#exportLink").attr("href", document.location.origin + document.location.pathname + hash);
+    $("#exportLink").attr("href", document.location.pathname + hash);
     if (document.location.hash != hash) {
         // Using replace() causes no change in browser history
         document.location.replace(hash);
