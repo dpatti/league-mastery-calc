@@ -155,7 +155,7 @@ button:active {
     border: 2px solid #999;
     border-radius: 8px;
     z-index: 1;
-    background-image: url(images/button-icons.png);
+    background-image: url(images/button-icons.jpg);
 }
 
 .button.unavailable {
