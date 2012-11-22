@@ -13,7 +13,6 @@ var TREE_OFFSET = 305;
 var HEIGHT_GAP = 26;
 var BUTTON_SIZE = 56;
 var state = [{}, {}, {}];
-var treePoints = [0, 0, 0];
 var totalPoints = 0;
 var buttonClasses = ["unavailable", "available", "full"];
 var rankClasses = ["num-unavailable", "num-available", "num-full"];
@@ -158,7 +157,7 @@ function drawButton(tree, index) {
                     status = "full";
                 } else {
                     // check if available
-                    if (masteryPointReq(tree, index) <= treePoints[tree] && masteryParentReq(tree, index))
+                    if (masteryPointReq(tree, index) <= treePoints(tree) && masteryParentReq(tree, index))
                         status = "available";
                     else
                         status = "unavailable";
@@ -279,7 +278,7 @@ function masteryTooltipBody(mastery, rank)  {
 function masteryTooltipReq(tree, index) {
     var missing = [];
     var pointReq = masteryPointReq(tree, index)
-    if (pointReq > treePoints[tree])
+    if (pointReq > treePoints(tree))
         missing.push("Requires " + pointReq + " points in " + treeNames[tree][0].toUpperCase() + treeNames[tree].slice(1));
     if (!masteryParentReq(tree, index)) {
         var parent = data[tree][index].parent;
@@ -311,8 +310,12 @@ function masterySpritePos(tree, index) {
     return 0 - 58 * (treeOffsets[tree] + index);
 }
 
+function masteryTier(tree, index) {
+    return Math.floor((data[tree][index].index-1) / 4);
+}
+
 function masteryPointReq(tree, index) {
-    return Math.floor((data[tree][index].index-1) / 4) * 4;
+    return masteryTier(tree, index) * 4;
 }
 
 function masteryParentReq(tree, index) {
@@ -322,6 +325,13 @@ function masteryParentReq(tree, index) {
     return true;
 }
 
+function treePoints(tree, tier) {
+    var points = 0;
+    for (var i in state[tree])
+        if (!tier || tier > masteryTier(tree, i))
+            points += state[tree][i];
+    return points;
+}
 
 function isValidState(tree, index, rank, mod) {
     var mastery = data[tree][index];
@@ -335,7 +345,7 @@ function isValidState(tree, index, rank, mod) {
             return false;
 
         // Check this mastery's rank requirements: never account for current rank
-        if (masteryPointReq(tree, index) > treePoints[tree] - rank)
+        if (masteryPointReq(tree, index) > treePoints(tree) - rank)
             return false;
 
         // Check this mastery's parent requirements
@@ -350,7 +360,9 @@ function isValidState(tree, index, rank, mod) {
             if (i != index)
                 // Figure out tier, multiply by 4 to get req points
                 if (state[tree][i] > 0 && 
-                    masteryPointReq(tree, i) > treePoints[tree] + mod - (state[tree][i] || 0))
+                    // Calculate points in this tree up to this tier, and
+                    // subtract one if we're removing from this portion
+                    masteryPointReq(tree, i) > treePoints(tree, masteryTier(tree, i)) - (masteryTier(tree, index) < masteryTier(tree, i)))
                     return false;
 
         // Check child requirements
@@ -365,7 +377,6 @@ function isValidState(tree, index, rank, mod) {
 
 function setState(tree, index, rank, mod) {
     state[tree][index] = rank + mod;
-    treePoints[tree] += mod;
     totalPoints += mod;
 
     updateButtons();
@@ -387,8 +398,7 @@ function resetStates(quiet) {
 
 // Used in both resetStates and via panel
 function resetTree(tree, update) {
-    totalPoints -= treePoints[tree];
-    treePoints[tree] = 0;
+    totalPoints -= treePoints(tree);
     for (var index in state[tree])
         state[tree][index] = 0;
 }
@@ -401,7 +411,7 @@ function updateButtons() {
 
 function updateLabels() {
     for (var tree=0; tree<3; tree++) {
-        $("div[data-idx="+tree+"]").text(treePoints[tree]);
+        $("div[data-idx="+tree+"]").text(treePoints(tree));
         $("#points>.count").text(MAX_POINTS - totalPoints);
     }
 }
@@ -413,7 +423,7 @@ function updateLink() {
     hash = '#' + hash;
 
     // Update link and url only if we have to
-    $("#exportLink").attr("href", document.location.origin + document.location.pathname + hash);
+    $("#exportLink").attr("href", document.location.pathname + hash);
     if (document.location.hash != hash) {
         // Using replace() causes no change in browser history
         document.location.replace(hash);
@@ -541,7 +551,6 @@ function importMasteries(str) {
                 var value = (cur >> shift) & ((1 << sizes[j]) - 1);
 
                 state[tree][index] = value;
-                treePoints[tree] += value;
                 totalPoints += value;
             }
         } else {
