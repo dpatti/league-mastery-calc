@@ -488,7 +488,7 @@ function exportMasteries() {
             // - or we can collect any within the next subset that would fit in
             //   this bit. we do this with some cool filter/map/reduce
             if (collected > 0 || 
-                [0,1,2]
+                [0,1,2,3,4]
                     .filter(function(a){ return a < space; })
                     .map(function(a){ return state[tree][index+a] || 0; })
                     .some(function(a){ return a > 0; })){
@@ -541,7 +541,7 @@ function importMasteries(str) {
         if ((cur & 040) == 0) {
             // extract data
             var num = bitfit(tree, index, maxbits); // how many we can fit
-            var sizes = [0, 1, 2] // an array of each mastery held in this char
+            var sizes = [0, 1, 2, 3, 4] // an array of each mastery held in this char
                             .filter(function(a){ return a < num; })
                             .map(function(a){ return bitlen(tree, index+a); });
             for (var j=0; j<sizes.length; j++, index++) {
