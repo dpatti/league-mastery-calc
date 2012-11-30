@@ -48,9 +48,9 @@ var data = [
         {
             index: 8,
             name: "Destruction",
-            ranks: 2,
-            desc: "Increase damage to turrets by #%",
-            rankInfo: [2.5, 5],
+            ranks: 1,
+            desc: "Increase damage to turrets by 5%",
+            rankInfo: [],
         },
         {
             index: 9,
@@ -93,9 +93,9 @@ var data = [
         {
             index: 15,
             name: "Mental Force",
-            ranks: 4,
+            ranks: 3,
             desc: "# Ability Power",
-            rankInfo: [1.5, 3, 4.5, 6],
+            rankInfo: [2, 4, 6],
         },
         {
             index: 16,
@@ -248,9 +248,9 @@ var data = [
         {
             index: 18,
             name: "Legendary Armor",
-            ranks: 4,
+            ranks: 3,
             desc: "Increases bonus Armor and Magic Resist by +#%",
-            rankInfo: [1.25, 2.5, 3.75, 5],
+            rankInfo: [2, 4, 6],
         },
         {
             index: 19,
@@ -262,9 +262,9 @@ var data = [
         {
             index: 20,
             name: "Reinforced Armor",
-            ranks: 2,
-            desc: "Reduce damage taken from critical strikes by #%",
-            rankInfo: [5, 10],
+            ranks: 1,
+            desc: "Reduce damage taken from critical strikes by 10%",
+            rankInfo: [],
         },
         {
             index: 22,
@@ -348,11 +348,10 @@ var data = [
         },
         {
             index: 11,
-            name: "Strength of Spirit",
+            name: "Vampirism",
             ranks: 3,
-            desc: "Up to +# Health Regen per 5 seconds for each 400 Mana you possess",
+            desc: "+#% Lifesteal and Spell Vamp",
             rankInfo: [1, 2, 3],
-            parent: 6,
         },
         {
             index: 12,
@@ -378,9 +377,9 @@ var data = [
         },
         {
             index: 15,
-            name: "Vampirism",
+            name: "Strength of Spirit",
             ranks: 3,
-            desc: "+#% Lifesteal and Spell Vamp",
+            desc: "Up to +# Health Regen per 5 seconds for each 400 Mana you possess",
             rankInfo: [1, 2, 3],
         },
         {
